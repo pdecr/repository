@@ -28,3 +28,16 @@ resource "aws_internet_gateway" "igw_IAC" {
     Name = "igw_IAC"
   }
 }
+
+resource "aws_route_table" "rtb_IAC" {
+  vpc_id = "${aws_vpc.IAC.id}"
+
+  route {
+    cidr_block = "0.0.0.0/0"
+    gateway_id = "${aws_internet_gateway.igw_IAC.id}"
+  }
+
+  tags {
+    Name = "rtb_IAC"
+  }
+}
