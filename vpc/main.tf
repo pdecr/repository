@@ -13,8 +13,9 @@ resource "aws_vpc" "IAC" {
 }
 
 resource "aws_subnet" "IAC_subnet1" {
-  vpc_id     = "${aws_vpc.IAC.id}"
-  cidr_block = "172.23.1.0/24"
+  vpc_id            = "${aws_vpc.IAC.id}"
+  cidr_block        = "172.23.1.0/24"
+  availability_zone = "eu-west-1a"
 
   tags {
     Name = "IAC_subnet1"
@@ -40,4 +41,9 @@ resource "aws_route_table" "rtb_IAC" {
   tags {
     Name = "rtb_IAC"
   }
+}
+
+resource "aws_route_table_association" "rtb_assoc_IAC" {
+  subnet_id      = "${aws_subnet.IAC_subnet1.id}"
+  route_table_id = "${aws_route_table.rtb_IAC.id}"
 }
