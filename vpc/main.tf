@@ -4,8 +4,7 @@ provider "aws" {
 }
 
 resource "aws_vpc" "IAC" {
-  cidr_block       = "172.23.0.0/16"
-  instance_tenancy = "dedicated"
+  cidr_block = "172.23.0.0/16"
 
   tags {
     Name = "IAC tooling"
