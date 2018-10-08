@@ -1,23 +1,23 @@
 # Configure the AWS Provider
 provider "aws" {
-  region = "eu-west-1"
+  region = "${var.region}"
 }
 
 resource "aws_vpc" "IAC" {
-  cidr_block = "172.23.0.0/16"
+  cidr_block = "${var.cidr_blockVPC}"
 
   tags {
-    Name = "IAC tooling"
+    Name = "${var.tag_nameVPC}"
   }
 }
 
 resource "aws_subnet" "IAC_subnet1" {
   vpc_id            = "${aws_vpc.IAC.id}"
-  cidr_block        = "172.23.1.0/24"
-  availability_zone = "eu-west-1a"
+  cidr_block        = "${var.cidr_blockSubnet}"
+  availability_zone = "${var.azSubnet}"
 
   tags {
-    Name = "IAC_subnet1"
+    Name = "${var.tag_nameSubnet}"
   }
 }
 
@@ -25,7 +25,7 @@ resource "aws_internet_gateway" "igw_IAC" {
   vpc_id = "${aws_vpc.IAC.id}"
 
   tags {
-    Name = "igw_IAC"
+    Name = "${var.tag_nameigw}"
   }
 }
 
@@ -38,7 +38,7 @@ resource "aws_route_table" "rtb_IAC" {
   }
 
   tags {
-    Name = "rtb_IAC"
+    Name = "${var.tag_namertb}"
   }
 }
 
