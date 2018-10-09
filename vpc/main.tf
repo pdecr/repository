@@ -13,13 +13,12 @@ resource "aws_vpc" "IAC" {
 
 resource "aws_subnet" "IAC_subnet" {
   count = 2
+   # This will create 2 subnets
   vpc_id            = "${aws_vpc.IAC.id}"
   cidr_block        = "${element(var.cidr_blockSubnet,count.index)}"
   availability_zone = "${element(var.azSubnet, count.index)}"
 
-  # This will create 2 subnets
-  
-
+   
   tags {
     Name = "${var.tag_nameSubnet}-${count.index}"
   }
