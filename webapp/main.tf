@@ -6,7 +6,7 @@ data "aws_ami" "ubuntu_ami" {
 most_recent=true
 filter {
     name   = "name"
-    values = ["ubuntu/images/hvm-ssd/ubuntu-bionic-18.04-amd64-server-*"]
+    values = "${var.ami_ubuntu}"
   }
 }
 
@@ -31,7 +31,7 @@ data "aws_subnet" "subnet_selected" {
 
 data "aws_vpc" "vpc_selected" {
 
-     filter {
+    filter {
     name = "tag:Name"
     values = "${var.vpc_selected_name}"
   }
@@ -65,7 +65,7 @@ resource "aws_security_group" "web_sg" {
 
 resource "aws_instance" "web" {
   ami           = "${data.aws_ami.ubuntu_ami.id}"
-  instance_type = "t2.micro"
+  instance_type = "${var.instance_type}"
   security_groups=["${aws_security_group.web_sg.id}"]
   key_name ="${var.key_pair}"
   subnet_id="${data.aws_subnet.subnet_selected.id}"

@@ -12,6 +12,15 @@ variable "instance_name" {
 }
 
 variable "key_pair"{
-    
+
 }
 
+
+variable "instance_type"{
+
+}
+
+
+variable "ami_ubuntu"{
+    type = "list"
+}
