@@ -11,13 +11,17 @@ resource "aws_vpc" "IAC" {
   }
 }
 
-resource "aws_subnet" "IAC_subnet1" {
+resource "aws_subnet" "IAC_subnet" {
+  count = 2
   vpc_id            = "${aws_vpc.IAC.id}"
-  cidr_block        = "${var.cidr_blockSubnet}"
-  availability_zone = "${var.azSubnet}"
+  cidr_block        = "${element(var.cidr_blockSubnet,count.index)}"
+  availability_zone = "${element(var.azSubnet, count.index)}"
+
+  # This will create 2 subnets
+  
 
   tags {
-    Name = "${var.tag_nameSubnet}"
+    Name = "${var.tag_nameSubnet}-${count.index}"
   }
 }
 
@@ -43,6 +47,8 @@ resource "aws_route_table" "rtb_IAC" {
 }
 
 resource "aws_route_table_association" "rtb_assoc_IAC" {
-  subnet_id      = "${aws_subnet.IAC_subnet1.id}"
+  count          = 2
+  subnet_id      = "${element(aws_subnet.IAC_subnet.*.id,count.index)}"
   route_table_id = "${aws_route_table.rtb_IAC.id}"
+  
 }
