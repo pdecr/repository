@@ -10,6 +10,7 @@ module "prodwebapp" {
   subnet_selected_name = ["IAC_subnet2-0", "IAC_subnet2-1"]
   vpc_selected_name    = ["IAC tooling2"]
   ami_ubuntu           = ["ubuntu/images/hvm-ssd/ubuntu-bionic-18.04-amd64-server-*"]
+  ami_packer           = ["ami_packer*"]
   instance_name        = "webInstance2"
   key_pair             = "key_pair"
   instance_type        = "t2.micro"
