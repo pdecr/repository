@@ -3,5 +3,6 @@ terraform {
     bucket = "bucket-iac-terraform"
     key    = "webapp1/terraform.tfstate"
     region = "eu-west-1"
+    dynamodb_table="tfstate"
   }
 }
