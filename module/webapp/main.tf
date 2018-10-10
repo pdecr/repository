@@ -17,18 +17,6 @@ data "template_file" "init" {
     username = "pdecr"
   }
 }
-
-
-data "aws_subnet" "subnet_selected" {
-
-    filter {
-    name = "tag:Name"
-    values ="${var.subnet_selected_name}"
-  }
-  
-}
-
-
 data "aws_vpc" "vpc_selected" {
 
     filter {
@@ -38,11 +26,34 @@ data "aws_vpc" "vpc_selected" {
     
 }
 
+data "aws_subnet_ids" "subnets" {
+  vpc_id = "${data.aws_vpc.vpc_selected.id}"
+}
+
+
+
+resource "aws_instance" "web" {
+  count = 2
+  ami           = "${data.aws_ami.ubuntu_ami.id}"
+  instance_type = "${var.instance_type}"
+  vpc_security_group_ids=["${aws_security_group.web_sg.id}"]
+  key_name ="${var.key_pair}"
+  subnet_id="${element(data.aws_subnet_ids.subnets.ids,count.index)}"
+
+
+  associate_public_ip_address=true
+  tags {
+    Name = "${var.instance_name}-${count.index}"
+  }
+
+  user_data = "${data.template_file.init.rendered}"
+}
 
 resource "aws_security_group" "web_sg" {
   name        = "web_sg"
   description = "Allow all web traffic"
   vpc_id      = "${data.aws_vpc.vpc_selected.id}"
+  
 
   ingress {
     from_port   = 80
@@ -60,19 +71,37 @@ resource "aws_security_group" "web_sg" {
   }
 }
 
-
-
-
-resource "aws_instance" "web" {
-  ami           = "${data.aws_ami.ubuntu_ami.id}"
-  instance_type = "${var.instance_type}"
+# Create a new load balancer
+resource "aws_elb" "elbweb" {
+  name               = "elbweb"
+  
   security_groups=["${aws_security_group.web_sg.id}"]
-  key_name ="${var.key_pair}"
-  subnet_id="${data.aws_subnet.subnet_selected.id}"
-  associate_public_ip_address=true
-  tags {
-    Name = "${var.instance_name}"
+  subnets=["${data.aws_subnet_ids.subnets.ids}"]
+  listener {
+    instance_port     = 80
+    instance_protocol = "http"
+    lb_port           = 80
+    lb_protocol       = "http"
   }
 
-  user_data = "${data.template_file.init.rendered}"
+ 
+
+  health_check {
+    healthy_threshold   = 2
+    unhealthy_threshold = 2
+    timeout             = 3
+    target              = "HTTP:80/"
+    interval            = 30
+  }
+
+  instances                   = ["${aws_instance.web.*.id}"]
+  cross_zone_load_balancing   = true
+  idle_timeout                = 400
+  connection_draining         = true
+  connection_draining_timeout = 400
+
+  tags {
+    Name = "${var.elb_tag}"
+  }
 }
+

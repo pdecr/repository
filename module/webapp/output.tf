@@ -3,5 +3,5 @@ output "vpc_id" {
 }
 
 output "public_ip_webinstance" {
-  value = "${aws_instance.web.public_ip}"
+  value = "${aws_instance.web.*.public_ip}"
 }
